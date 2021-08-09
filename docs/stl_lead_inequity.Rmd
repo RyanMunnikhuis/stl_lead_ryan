@@ -1,0 +1,48 @@
+---
+title: "tl_lead_inequity"
+author: "Ryan Munnikhuis"
+date: "8/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(skimr)
+
+```
+
+
+```{r}
+stl_lead = read_delim(here::here("data", "stl_blood_lead.csv")) %>% clean_names() %>% mutate(prop_white = white / total_pop * 100) %>% 
+mutate(pct_elevated = str_replace(pct_elevated, 
+                                  pattern = ",", 
+                                  replacement = ".")) %>% 
+mutate(pct_elevated = as.numeric(pct_elevated))
+```
+
+```{r}
+
+stl_lead_plot = ggplot(data = stl_lead, aes(x = prop_white, y = pct_elevated)) + geom_point(aes(color = prop_white), show.legend = FALSE) + 
+  scale_color_gradient(low = "blue", high = "orange")
+                       
+stl_lead_plot                      
+```
+```{r}
+ggsave(here::here("figs", "PCT_Elevated_Scatterplot.png"), height = 6, width = 5)
+```
+
+
+```{r}
+stl_lead_histogram = ggplot(data = stl_lead, aes(x = pct_elevated)) + geom_histogram(color = "orange", fill = "pink", alpha = 0.5) + 
+  theme_minimal() + 
+  labs(title = "Elevated Levels of Lead in Blood", 
+       x = "percent elevated")
+
+stl_lead_histogram
+
+ggsave(here::here("figs", "PCT_Elevated_Histogram.png"), height = 5, width = 5)
+```
+
